@@ -51,7 +51,7 @@ export default function Home() {
   return (
     <div className="w-full">
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-slate-900 to-slate-800 text-white py-20 px-4">
+  <section className="bg-linear-to-br from-slate-900 to-slate-800 text-white h-screen px-4 flex items-center justify-center">
         <div className="mx-auto max-w-7xl text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-4 text-balance">
             Selamat Datang di Website Kelurahan Sendangan
