@@ -4,10 +4,12 @@ import { useState, useEffect } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
-import { Newspaper, Search } from "lucide-react"
+import { Newspaper, Search, Calendar, ArrowRight } from "lucide-react"
+import { useScrollAnimation } from "@/hooks/use-scroll-animation"
 
 interface Post {
   id: number
@@ -25,6 +27,86 @@ interface PaginationData {
   total: number
   totalPages: number
   hasMore: boolean
+}
+
+function PostCard({ post, delay }: { post: Post; delay: number }) {
+  const { ref, isVisible } = useScrollAnimation<HTMLAnchorElement>({ threshold: 0.2 })
+
+  return (
+    <Link
+      ref={ref}
+      href={`/berita/${post.id}`}
+      className={`group relative bg-white border-2 border-slate-200 rounded-xl overflow-hidden transition-all duration-300 hover:border-primary hover:shadow-2xl hover:-translate-y-1 opacity-0-init ${
+        isVisible ? "animate-fade-in-up" : ""
+      }`}
+      style={{ animationDelay: `${delay}ms` }}
+    >
+      {/* Image Section */}
+      <div className="relative h-48 w-full bg-linear-to-br from-primary/10 to-secondary/10 overflow-hidden">
+        {post.featuredImage ? (
+          <>
+            <Image
+              src={post.featuredImage}
+              alt={post.title}
+              fill
+              className="object-cover group-hover:scale-110 transition-transform duration-500"
+              sizes="(max-width: 768px) 100vw, 50vw"
+            />
+            {/* Overlay */}
+            <div className="absolute inset-0 bg-linear-to-t from-black/40 to-transparent" />
+          </>
+        ) : (
+          <div className="flex items-center justify-center h-full">
+            <Newspaper className="h-12 w-12 text-muted-foreground group-hover:scale-110 transition-transform" />
+          </div>
+        )}
+
+        {/* Type Badge on Image */}
+        <div className="absolute top-4 left-4">
+          <Badge
+            className={`shadow-lg ${
+              post.type === "BERITA"
+                ? "bg-blue-500 hover:bg-blue-600 text-white"
+                : "bg-green-500 hover:bg-green-600 text-white"
+            }`}
+          >
+            {post.type === "BERITA" ? "📰 Berita" : "📢 Pengumuman"}
+          </Badge>
+        </div>
+
+        {/* Date Badge */}
+        <div className="absolute bottom-4 right-4">
+          <Badge variant="secondary" className="bg-white/90 text-slate-700 shadow-md flex items-center gap-1">
+            <Calendar className="h-3 w-3" />
+            {new Date(post.date || post.createdAt).toLocaleDateString("id-ID", {
+              day: "numeric",
+              month: "short",
+            })}
+          </Badge>
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="p-6">
+        <h3 className="font-bold text-slate-900 text-lg mb-2 line-clamp-2 group-hover:text-primary transition-colors">
+          {post.title}
+        </h3>
+        
+        <p className="text-slate-600 text-sm leading-relaxed line-clamp-3 mb-4">
+          {post.body?.replace(/<[^>]*>/g, "") || ""}
+        </p>
+
+        {/* Read more indicator */}
+        <div className="flex items-center text-primary text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+          <span>Baca selengkapnya</span>
+          <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
+        </div>
+      </div>
+
+      {/* Bottom accent */}
+      <div className="absolute bottom-0 left-0 right-0 h-1 bg-linear-to-r from-primary/0 via-primary to-primary/0 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300" />
+    </Link>
+  )
 }
 
 export default function BeritaPage() {
@@ -82,22 +164,6 @@ export default function BeritaPage() {
   const handlePageChange = (newPage: number) => {
     fetchPosts(newPage, searchQuery)
     window.scrollTo({ top: 0, behavior: "smooth" })
-  }
-
-  const formatDate = (dateString: string | null) => {
-    if (!dateString) return ""
-    return new Date(dateString).toLocaleDateString("id-ID", {
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-    })
-  }
-
-  const truncateText = (text: string | null, maxLength: number) => {
-    if (!text) return ""
-    const plainText = text.replace(/<[^>]*>/g, "")
-    if (plainText.length <= maxLength) return plainText
-    return plainText.substring(0, maxLength) + "..."
   }
 
   return (
@@ -184,48 +250,8 @@ export default function BeritaPage() {
           ) : (
             <>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {posts.map((post) => (
-                  <Link
-                    key={post.id}
-                    href={`/berita/${post.id}`}
-                    className="bg-white border border-slate-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow"
-                  >
-                    <div className="relative h-48 w-full bg-slate-100">
-                      {post.featuredImage ? (
-                        <Image
-                          src={post.featuredImage}
-                          alt={post.title}
-                          fill
-                          className="object-cover"
-                          sizes="(max-width: 768px) 100vw, 50vw"
-                        />
-                      ) : (
-                        <div className="flex items-center justify-center h-full">
-                          <Newspaper className="h-12 w-12 text-muted-foreground" />
-                        </div>
-                      )}
-                    </div>
-                    <div className="p-6">
-                      <div className="flex items-start justify-between mb-3">
-                        <span
-                          className={`text-xs font-semibold px-3 py-1 rounded-full ${
-                            post.type === "BERITA"
-                              ? "bg-blue-100 text-blue-700"
-                              : "bg-green-100 text-green-700"
-                          }`}
-                        >
-                          {post.type === "BERITA" ? "Berita" : "Pengumuman"}
-                        </span>
-                        <span className="text-xs text-slate-500">
-                          {formatDate(post.date || post.createdAt)}
-                        </span>
-                      </div>
-                      <h3 className="font-semibold text-slate-900 text-lg mb-2">{post.title}</h3>
-                      <p className="text-slate-600 text-sm leading-relaxed">
-                        {truncateText(post.body, 150)}
-                      </p>
-                    </div>
-                  </Link>
+                {posts.map((post, index) => (
+                  <PostCard key={post.id} post={post} delay={index * 100} />
                 ))}
               </div>
 

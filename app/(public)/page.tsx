@@ -181,12 +181,13 @@ export default async function Home() {
             />
           ) : (
             <div className="grid md:grid-cols-3 gap-6">
-              {announcements.map((announcement) => (
+              {announcements.map((announcement, index) => (
                 <AnnouncementCard
                   key={announcement.id}
                   title={announcement.title}
                   date={formatDate(announcement.date || announcement.createdAt)}
                   body={truncateText(announcement.body, 100)}
+                  delay={index * 100}
                 />
               ))}
             </div>
@@ -212,12 +213,13 @@ export default async function Home() {
             />
           ) : (
             <div className="grid md:grid-cols-3 gap-6">
-              {potentials.map((potential) => (
+              {potentials.map((potential, index) => (
                 <FeatureCard
                   key={potential.id}
                   emoji={potential.emoji || '📍'}
                   name={potential.name}
                   desc={potential.desc || ''}
+                  delay={index * 100}
                 />
               ))}
             </div>
