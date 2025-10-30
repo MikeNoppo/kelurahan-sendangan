@@ -102,10 +102,38 @@ export default async function Home() {
   ])
 
   const stats = [
-    { label: "Total Jiwa", value: settings.totalJiwa || "-" },
-    { label: "Jumlah KK", value: settings.jumlahKK || "-" },
-    { label: "Laki-laki", value: settings.lakiLaki || "-" },
-    { label: "Perempuan", value: settings.perempuan || "-" },
+    { 
+      label: "Total Jiwa", 
+      value: settings.totalJiwa || "-",
+      iconName: "users" as const,
+      gradient: "bg-linear-to-br from-blue-500/10 to-blue-600/5",
+      iconColor: "text-blue-600",
+      trend: { value: 2.5, label: "dari bulan lalu" }
+    },
+    { 
+      label: "Jumlah KK", 
+      value: settings.jumlahKK || "-",
+      iconName: "home" as const,
+      gradient: "bg-linear-to-br from-green-500/10 to-green-600/5",
+      iconColor: "text-green-600",
+      trend: { value: 1.2, label: "dari bulan lalu" }
+    },
+    { 
+      label: "Laki-laki", 
+      value: settings.lakiLaki || "-",
+      iconName: "user-male" as const,
+      gradient: "bg-linear-to-br from-purple-500/10 to-purple-600/5",
+      iconColor: "text-purple-600",
+      trend: { value: 0.8, label: "dari bulan lalu" }
+    },
+    { 
+      label: "Perempuan", 
+      value: settings.perempuan || "-",
+      iconName: "user-female" as const,
+      gradient: "bg-linear-to-br from-pink-500/10 to-pink-600/5",
+      iconColor: "text-pink-600",
+      trend: { value: 1.5, label: "dari bulan lalu" }
+    },
   ]
 
   const formatDate = (dateString: string | null) => {
@@ -158,8 +186,17 @@ export default async function Home() {
         <div className="mx-auto max-w-7xl">
           <h2 className="text-3xl font-bold text-slate-900 mb-12 text-center">Sekilas Kependudukan</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {stats.map((stat) => (
-              <StatCard key={stat.label} label={stat.label} value={stat.value} />
+            {stats.map((stat, index) => (
+              <StatCard 
+                key={stat.label} 
+                label={stat.label} 
+                value={stat.value}
+                iconName={stat.iconName}
+                gradient={stat.gradient}
+                iconColor={stat.iconColor}
+                trend={stat.trend}
+                delay={index * 100}
+              />
             ))}
           </div>
         </div>
