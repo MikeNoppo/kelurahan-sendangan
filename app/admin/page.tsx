@@ -1,13 +1,52 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { FileText, Image as ImageIcon, Sparkles, Users } from "lucide-react"
 
 export default function AdminDashboard() {
-  const stats = [
+  const [stats, setStats] = useState({
+    posts: 0,
+    gallery: 0,
+    potentials: 0,
+    users: 0,
+  })
+
+  useEffect(() => {
+    fetchStats()
+  }, [])
+
+  const fetchStats = async () => {
+    try {
+      const [postsRes, galleryRes, potentialsRes, usersRes] = await Promise.all([
+        fetch('/api/admin/posts'),
+        fetch('/api/admin/gallery'),
+        fetch('/api/admin/potentials'),
+        fetch('/api/admin/users'),
+      ])
+
+      const [posts, gallery, potentials, users] = await Promise.all([
+        postsRes.json().catch(() => []),
+        galleryRes.json().catch(() => []),
+        potentialsRes.json().catch(() => []),
+        usersRes.json().catch(() => []),
+      ])
+
+      setStats({
+        posts: posts.length || 0,
+        gallery: gallery.length || 0,
+        potentials: potentials.length || 0,
+        users: users.length || 0,
+      })
+    } catch (error) {
+      console.error('Failed to fetch stats:', error)
+    }
+  }
+
+  const statCards = [
     {
       title: "Total Posts",
-      value: "0",
+      value: stats.posts.toString(),
       icon: FileText,
       description: "Berita & Pengumuman",
       color: "text-blue-600",
@@ -15,7 +54,7 @@ export default function AdminDashboard() {
     },
     {
       title: "Galeri",
-      value: "0",
+      value: stats.gallery.toString(),
       icon: ImageIcon,
       description: "Foto kegiatan",
       color: "text-green-600",
@@ -23,7 +62,7 @@ export default function AdminDashboard() {
     },
     {
       title: "Potensi",
-      value: "3",
+      value: stats.potentials.toString(),
       icon: Sparkles,
       description: "Unggulan kelurahan",
       color: "text-purple-600",
@@ -31,7 +70,7 @@ export default function AdminDashboard() {
     },
     {
       title: "Users",
-      value: "1",
+      value: stats.users.toString(),
       icon: Users,
       description: "Admin users",
       color: "text-orange-600",
@@ -47,7 +86,7 @@ export default function AdminDashboard() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {stats.map((stat) => {
+        {statCards.map((stat) => {
           const Icon = stat.icon
           return (
             <Card key={stat.title}>
