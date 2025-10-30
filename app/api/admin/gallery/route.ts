@@ -1,21 +1,48 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
+import { NextRequest, NextResponse } from 'next/server'
+import { auth } from '@/lib/auth'
+import { prisma } from '@/lib/prisma'
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
-    const session = await auth();
+    const session = await auth()
     if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const gallery = await prisma.galleryItem.findMany({
+    const items = await prisma.galleryItem.findMany({
       orderBy: { createdAt: 'desc' }
-    });
+    })
 
-    return NextResponse.json(gallery);
+    return NextResponse.json(items)
   } catch (error) {
-    console.error('Get gallery error:', error);
-    return NextResponse.json({ error: 'Failed to fetch gallery' }, { status: 500 });
+    console.error('Gallery fetch error:', error)
+    return NextResponse.json({ error: 'Failed to fetch gallery' }, { status: 500 })
+  }
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const session = await auth()
+    if (!session) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    const { url, caption } = await request.json()
+
+    if (!url) {
+      return NextResponse.json({ error: 'URL is required' }, { status: 400 })
+    }
+
+    const item = await prisma.galleryItem.create({
+      data: {
+        url,
+        caption: caption || null
+      }
+    })
+
+    return NextResponse.json(item)
+  } catch (error) {
+    console.error('Gallery create error:', error)
+    return NextResponse.json({ error: 'Failed to create gallery item' }, { status: 500 })
   }
 }

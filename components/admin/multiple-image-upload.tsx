@@ -164,11 +164,11 @@ export function MultipleImageUpload({ onUploadComplete }: MultipleImageUploadPro
 
       {items.length > 0 && (
         <div className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4">
             {items.map(item => (
               <Card key={item.id} className="p-4">
                 <div className="flex gap-4">
-                  <div className="relative w-24 h-24 shrink-0">
+                  <div className="relative w-32 h-32 shrink-0">
                     <Image
                       src={item.preview}
                       alt="Preview"

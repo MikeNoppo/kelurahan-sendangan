@@ -6,7 +6,7 @@ import { join } from 'path'
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth()
@@ -14,7 +14,8 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const id = parseInt(params.id)
+    const { id: idParam } = await context.params
+    const id = parseInt(idParam)
     
     const item = await prisma.galleryItem.findUnique({
       where: { id }
