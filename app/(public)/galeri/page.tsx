@@ -2,13 +2,10 @@
 
 import { useState, useEffect } from "react"
 import Image from "next/image"
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
+import { Dialog, DialogContent } from "@/components/ui/dialog"
 import { Skeleton } from "@/components/ui/skeleton"
-import { ImageIcon, X, ChevronLeft, ChevronRight, ZoomIn, ZoomOut, Download, Calendar } from "lucide-react"
+import { ImageIcon } from "lucide-react"
 import { EmptyState } from "@/components/empty-state"
-import { useScrollAnimation } from "@/hooks/use-scroll-animation"
-import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
 
 interface GalleryItem {
   id: number
@@ -21,8 +18,6 @@ export default function GaleriPage() {
   const [images, setImages] = useState<GalleryItem[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedImage, setSelectedImage] = useState<GalleryItem | null>(null)
-  const [selectedIndex, setSelectedIndex] = useState(0)
-  const [zoom, setZoom] = useState(1)
 
   useEffect(() => {
     const fetchGallery = async () => {
@@ -51,123 +46,6 @@ export default function GaleriPage() {
       year: "numeric",
     })
   }
-
-  // Gallery Card Component with scroll animation
-  const GalleryCard = ({ 
-    image, 
-    index, 
-    onClick 
-  }: { 
-    image: GalleryItem; 
-    index: number; 
-    onClick: () => void;
-  }) => {
-    const ref = useScrollAnimation<HTMLDivElement>({
-      threshold: 0.1,
-      triggerOnce: true
-    });
-
-    return (
-      <div
-        ref={ref.ref}
-        className={`group overflow-hidden rounded-lg shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer opacity-0-init ${
-          ref.isVisible ? 'animate-fade-in-up' : ''
-        }`}
-        style={{ animationDelay: `${(index % 3) * 100}ms` }}
-        onClick={onClick}
-      >
-        <div className="relative w-full h-64 bg-slate-200 overflow-hidden">
-          <Image
-            src={image.url}
-            alt={image.caption || "Gallery image"}
-            fill
-            className="object-cover group-hover:scale-110 transition-transform duration-500"
-            sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-          />
-          <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-          <div className="absolute bottom-0 left-0 right-0 p-4 text-white transform translate-y-full group-hover:translate-y-0 transition-transform duration-300">
-            <p className="font-medium line-clamp-2">{image.caption || "Foto Kegiatan"}</p>
-          </div>
-        </div>
-        <div className="bg-white p-4">
-          <p className="text-slate-700 font-medium text-center line-clamp-1">
-            {image.caption || "Foto Kegiatan"}
-          </p>
-          <p className="text-xs text-muted-foreground text-center mt-1">
-            {formatDate(image.createdAt)}
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  const openLightbox = (image: GalleryItem, index: number) => {
-    setSelectedImage(image)
-    setSelectedIndex(index)
-    setZoom(1)
-  }
-
-  const closeLightbox = () => {
-    setSelectedImage(null)
-    setZoom(1)
-  }
-
-  const goToPrevious = () => {
-    const newIndex = selectedIndex > 0 ? selectedIndex - 1 : images.length - 1
-    setSelectedIndex(newIndex)
-    setSelectedImage(images[newIndex])
-    setZoom(1)
-  }
-
-  const goToNext = () => {
-    const newIndex = selectedIndex < images.length - 1 ? selectedIndex + 1 : 0
-    setSelectedIndex(newIndex)
-    setSelectedImage(images[newIndex])
-    setZoom(1)
-  }
-
-  const handleZoomIn = () => {
-    setZoom((prev) => Math.min(prev + 0.25, 3))
-  }
-
-  const handleZoomOut = () => {
-    setZoom((prev) => Math.max(prev - 0.25, 0.5))
-  }
-
-  const handleDownload = async () => {
-    if (!selectedImage) return
-    
-    try {
-      const response = await fetch(selectedImage.url)
-      const blob = await response.blob()
-      const url = window.URL.createObjectURL(blob)
-      const link = document.createElement('a')
-      link.href = url
-      link.download = `kelurahan-sendangan-${selectedImage.id}.jpg`
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
-      window.URL.revokeObjectURL(url)
-    } catch (error) {
-      console.error('Download failed:', error)
-    }
-  }
-
-  // Keyboard navigation
-  useEffect(() => {
-    if (!selectedImage) return
-
-    const handleKeyPress = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') closeLightbox()
-      if (e.key === 'ArrowLeft') goToPrevious()
-      if (e.key === 'ArrowRight') goToNext()
-      if (e.key === '+' || e.key === '=') handleZoomIn()
-      if (e.key === '-') handleZoomOut()
-    }
-
-    window.addEventListener('keydown', handleKeyPress)
-    return () => window.removeEventListener('keydown', handleKeyPress)
-  }, [selectedImage, selectedIndex])
 
   return (
     <div className="w-full">
@@ -210,125 +88,59 @@ export default function GaleriPage() {
             />
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {images.map((image, index) => (
-                <GalleryCard
+              {images.map((image) => (
+                <div
                   key={image.id}
-                  image={image}
-                  index={index}
-                  onClick={() => openLightbox(image, index)}
-                />
+                  className="group overflow-hidden rounded-lg shadow-md hover:shadow-lg transition-shadow cursor-pointer"
+                  onClick={() => setSelectedImage(image)}
+                >
+                  <div className="relative w-full h-64 bg-slate-200">
+                    <Image
+                      src={image.url}
+                      alt={image.caption || "Gallery image"}
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-300"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    />
+                  </div>
+                  <div className="bg-slate-50 p-4">
+                    <p className="text-slate-700 font-medium text-center line-clamp-1">
+                      {image.caption || "Foto Kegiatan"}
+                    </p>
+                    <p className="text-xs text-muted-foreground text-center mt-1">
+                      {formatDate(image.createdAt)}
+                    </p>
+                  </div>
+                </div>
               ))}
             </div>
           )}
         </div>
       </section>
 
-      {/* Enhanced Lightbox Dialog */}
+      {/* Lightbox Dialog */}
       <Dialog open={!!selectedImage} onOpenChange={() => setSelectedImage(null)}>
-        <DialogContent className="max-w-7xl w-full h-[95vh] p-0 gap-0 bg-black/95">
-          <VisuallyHidden>
-            <DialogTitle>
-              {selectedImage?.caption || "Gallery Image"}
-            </DialogTitle>
-          </VisuallyHidden>
+        <DialogContent className="max-w-4xl">
           {selectedImage && (
-            <>
-              {/* Close Button */}
-              <button
-                onClick={() => setSelectedImage(null)}
-                className="absolute top-4 right-4 z-50 p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors"
-              >
-                <X className="h-6 w-6" />
-              </button>
-
-              {/* Image Counter */}
-              <div className="absolute top-4 left-4 z-50 px-3 py-1 rounded-full bg-black/50 text-white text-sm font-medium">
-                {selectedIndex + 1} / {images.length}
+            <div className="space-y-4">
+              <div className="relative w-full h-[70vh]">
+                <Image
+                  src={selectedImage.url}
+                  alt={selectedImage.caption || "Gallery image"}
+                  fill
+                  className="object-contain"
+                  sizes="(max-width: 1024px) 100vw, 1024px"
+                />
               </div>
-
-              {/* Navigation Arrows */}
-              {selectedIndex > 0 && (
-                <button
-                  onClick={goToPrevious}
-                  className="absolute left-4 top-1/2 -translate-y-1/2 z-50 p-3 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors"
-                >
-                  <ChevronLeft className="h-8 w-8" />
-                </button>
-              )}
-              {selectedIndex < images.length - 1 && (
-                <button
-                  onClick={goToNext}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 z-50 p-3 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors"
-                >
-                  <ChevronRight className="h-8 w-8" />
-                </button>
-              )}
-
-              {/* Main Image */}
-              <div className="relative w-full h-full flex items-center justify-center p-20">
-                <div 
-                  className="relative max-w-full max-h-full transition-transform duration-300 ease-out"
-                  style={{ transform: `scale(${zoom})` }}
-                >
-                  <Image
-                    src={selectedImage.url}
-                    alt={selectedImage.caption || "Gallery image"}
-                    width={1920}
-                    height={1080}
-                    className="object-contain max-w-full max-h-[70vh]"
-                  />
+              {selectedImage.caption && (
+                <div className="text-center">
+                  <p className="text-lg font-medium">{selectedImage.caption}</p>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    {formatDate(selectedImage.createdAt)}
+                  </p>
                 </div>
-              </div>
-
-              {/* Bottom Toolbar */}
-              <div className="absolute bottom-0 left-0 right-0 bg-linear-to-t from-black/90 to-transparent p-6">
-                {/* Zoom Controls */}
-                <div className="flex items-center justify-center gap-2 mb-4">
-                  <Button
-                    size="sm"
-                    variant="secondary"
-                    onClick={handleZoomOut}
-                    disabled={zoom <= 0.5}
-                    className="bg-white/10 hover:bg-white/20 text-white"
-                  >
-                    <ZoomOut className="h-4 w-4 mr-1" />
-                    Zoom Out
-                  </Button>
-                  <span className="text-white text-sm font-medium px-3">
-                    {Math.round(zoom * 100)}%
-                  </span>
-                  <Button
-                    size="sm"
-                    variant="secondary"
-                    onClick={handleZoomIn}
-                    disabled={zoom >= 3}
-                    className="bg-white/10 hover:bg-white/20 text-white"
-                  >
-                    <ZoomIn className="h-4 w-4 mr-1" />
-                    Zoom In
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="secondary"
-                    onClick={handleDownload}
-                    className="bg-white/10 hover:bg-white/20 text-white ml-4"
-                  >
-                    <Download className="h-4 w-4 mr-1" />
-                    Download
-                  </Button>
-                </div>
-
-                {/* Caption and Date */}
-                {selectedImage.caption && (
-                  <div className="text-center text-white">
-                    <p className="text-lg font-medium">{selectedImage.caption}</p>
-                    <p className="text-sm text-white/70 mt-1">
-                      {formatDate(selectedImage.createdAt)}
-                    </p>
-                  </div>
-                )}
-              </div>
-            </>
+              )}
+            </div>
           )}
         </DialogContent>
       </Dialog>
