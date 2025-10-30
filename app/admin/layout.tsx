@@ -1,6 +1,16 @@
+import type { Metadata } from "next"
 import { AdminSidebar } from "@/components/admin/admin-sidebar"
 import { AdminHeader } from "@/components/admin/admin-header"
 import { SessionProvider } from "next-auth/react"
+import { Geist } from "next/font/google"
+import "../globals.css"
+
+const geist = Geist({ subsets: ["latin"] })
+
+export const metadata: Metadata = {
+  title: "Admin Panel - Kelurahan Sendangan",
+  description: "Panel administrasi Kelurahan Sendangan",
+}
 
 export default function AdminLayout({
   children,
@@ -8,16 +18,20 @@ export default function AdminLayout({
   children: React.ReactNode
 }) {
   return (
-    <SessionProvider>
-      <div className="flex h-screen overflow-hidden">
-        <AdminSidebar />
-        <div className="flex flex-1 flex-col overflow-hidden">
-          <AdminHeader />
-          <main className="flex-1 overflow-y-auto bg-slate-50 p-6">
-            {children}
-          </main>
-        </div>
-      </div>
-    </SessionProvider>
+    <html lang="id">
+      <body className={`${geist.className} antialiased`}>
+        <SessionProvider>
+          <div className="flex h-screen overflow-hidden">
+            <AdminSidebar />
+            <div className="flex flex-1 flex-col overflow-hidden">
+              <AdminHeader />
+              <main className="flex-1 overflow-y-auto bg-slate-50 p-6">
+                {children}
+              </main>
+            </div>
+          </div>
+        </SessionProvider>
+      </body>
+    </html>
   )
 }
