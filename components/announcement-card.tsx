@@ -27,9 +27,9 @@ export function AnnouncementCard({ title, date, body, delay = 0 }: AnnouncementC
       
       {/* Date Badge - Corner positioned */}
       <div className="absolute top-4 right-4 z-10">
-        <Badge variant="secondary" className="shadow-sm flex items-center gap-1.5 px-3 py-1.5">
-          <Calendar className="h-3 w-3" />
-          <span className="text-xs font-medium">{date}</span>
+        <Badge variant="outline" className="bg-white shadow-sm flex items-center gap-1.5 px-3 py-1.5 border-slate-300">
+          <Calendar className="h-3 w-3 text-slate-600" />
+          <span className="text-xs font-medium text-slate-700">{date}</span>
         </Badge>
       </div>
 

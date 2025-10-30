@@ -76,7 +76,7 @@ function PostCard({ post, delay }: { post: Post; delay: number }) {
 
         {/* Date Badge */}
         <div className="absolute bottom-4 right-4">
-          <Badge variant="secondary" className="bg-white/90 text-slate-700 shadow-md flex items-center gap-1">
+          <Badge variant="secondary" className="bg-white/95 text-slate-900 border border-slate-200 shadow-md flex items-center gap-1">
             <Calendar className="h-3 w-3" />
             {new Date(post.date || post.createdAt).toLocaleDateString("id-ID", {
               day: "numeric",
