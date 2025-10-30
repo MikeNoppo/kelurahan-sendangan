@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
+import Image from "next/image"
 import { StatCard } from "@/components/stat-card"
 import { AnnouncementCard } from "@/components/announcement-card"
 import { FeatureCard } from "@/components/feature-card"
@@ -50,9 +51,18 @@ export default function Home() {
 
   return (
     <div className="w-full">
-      {/* Hero Section */}
-  <section className="bg-linear-to-br from-slate-900 to-slate-800 text-white h-screen px-4 flex items-center justify-center">
-        <div className="mx-auto max-w-7xl text-center">
+      <section className="relative bg-linear-to-br from-slate-900 to-slate-800 text-white h-screen px-4 flex items-center justify-center overflow-hidden">
+        <div className="absolute inset-0 z-0">
+          <Image
+            src="https://images.unsplash.com/photo-1560264280-88b68371db39?q=80&w=2070"
+            alt="Kelurahan Sendangan"
+            fill
+            priority
+            className="object-cover opacity-20"
+            sizes="100vw"
+          />
+        </div>
+        <div className="mx-auto max-w-7xl text-center relative z-10">
           <h1 className="text-4xl md:text-5xl font-bold mb-4 text-balance">
             Selamat Datang di Website Kelurahan Sendangan
           </h1>
@@ -60,7 +70,7 @@ export default function Home() {
             Akses informasi publik, berita, dan potensi kelurahan dalam satu tempat.
           </p>
           <Link href="/peta">
-            <Button variant="outline" size="lg" className="text-slate-900 bg-transparent">
+            <Button variant="outline" size="lg" className="text-slate-900 bg-white hover:bg-slate-100">
               Lihat Peta
             </Button>
           </Link>
@@ -79,7 +89,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Announcements Section */}
       <section className="py-16 px-4 bg-slate-50">
         <div className="mx-auto max-w-7xl">
           <h2 className="text-3xl font-bold text-slate-900 mb-12 text-center">Pengumuman Terkini</h2>
@@ -101,7 +110,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Potential Section */}
       <section className="py-16 px-4 bg-white">
         <div className="mx-auto max-w-7xl">
           <h2 className="text-3xl font-bold text-slate-900 mb-12 text-center">Potensi Unggulan</h2>
@@ -113,6 +121,35 @@ export default function Home() {
           <div className="text-center">
             <Link href="/potensi">
               <Button variant="default">Lihat Semua Potensi</Button>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <section className="py-16 px-4 bg-slate-50">
+        <div className="mx-auto max-w-7xl">
+          <h2 className="text-3xl font-bold text-slate-900 mb-12 text-center">Galeri Kegiatan</h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            {[
+              "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=400&h=300&fit=crop",
+              "https://images.unsplash.com/photo-1552664730-d307ca884978?w=400&h=300&fit=crop",
+              "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop",
+              "https://images.unsplash.com/photo-1511379938547-c1f69b13d835?w=400&h=300&fit=crop",
+            ].map((src, index) => (
+              <div key={index} className="relative h-48 rounded-lg overflow-hidden group">
+                <Image
+                  src={src}
+                  alt={`Galeri ${index + 1}`}
+                  fill
+                  className="object-cover group-hover:scale-110 transition-transform duration-300"
+                  sizes="(max-width: 768px) 50vw, 25vw"
+                />
+              </div>
+            ))}
+          </div>
+          <div className="text-center">
+            <Link href="/galeri">
+              <Button variant="default">Lihat Semua Galeri</Button>
             </Link>
           </div>
         </div>

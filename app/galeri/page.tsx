@@ -30,15 +30,22 @@ export default function GaleriPage() {
 
   return (
     <div className="w-full">
-      {/* Page Header */}
-      <section className="bg-slate-900 text-white py-12 px-4">
-        <div className="mx-auto max-w-7xl">
+      <section className="relative bg-slate-900 text-white py-12 px-4">
+        <div className="absolute inset-0 z-0">
+          <Image
+            src="https://images.unsplash.com/photo-1452587925148-ce544e77e70d?q=80&w=2074"
+            alt="Galeri Kegiatan"
+            fill
+            className="object-cover opacity-10"
+            sizes="100vw"
+          />
+        </div>
+        <div className="mx-auto max-w-7xl relative z-10">
           <h1 className="text-4xl font-bold">Galeri Kegiatan</h1>
           <p className="text-slate-300 mt-2">Dokumentasi kegiatan dan potensi Kelurahan Sendangan</p>
         </div>
       </section>
 
-      {/* Gallery Grid */}
       <section className="py-16 px-4 bg-white">
         <div className="mx-auto max-w-7xl">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -46,10 +53,11 @@ export default function GaleriPage() {
               <div key={index} className="group overflow-hidden rounded-lg shadow-md hover:shadow-lg transition-shadow">
                 <div className="relative w-full h-64 bg-slate-200">
                   <Image
-                    src={image.src || "/placeholder.svg"}
+                    src={image.src}
                     alt={image.caption}
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-300"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                   />
                 </div>
                 <div className="bg-slate-50 p-4">
