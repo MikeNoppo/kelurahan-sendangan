@@ -55,7 +55,7 @@ export function Sidebar() {
                   }`}
                   title={!isExpanded ? item.label : ""}
                 >
-                  <Icon size={20} className="flex-shrink-0" />
+                  <Icon size={20} className="shrink-0" />
                   {isExpanded && <span className="text-sm font-medium">{item.label}</span>}
                 </Link>
               )
