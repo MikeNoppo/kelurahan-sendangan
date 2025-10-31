@@ -163,7 +163,7 @@ export default function PostsPage() {
             <div className="space-y-4">
               {[1, 2, 3, 4].map((i) => (
                 <div key={i} className="flex items-center gap-4 rounded-lg border p-4">
-                  <Skeleton className="w-24 h-24 rounded shrink-0" />
+                  <Skeleton className="w-32 h-32 rounded shrink-0" />
                   <div className="flex-1 space-y-2">
                     <div className="flex items-center gap-2">
                       <Skeleton className="h-5 w-48" />
@@ -205,7 +205,7 @@ export default function PostsPage() {
                   className="flex items-center gap-4 rounded-lg border p-4 hover:bg-slate-50 transition-colors"
                 >
                   {post.featuredImage && (
-                    <div className="relative w-24 h-24 rounded overflow-hidden shrink-0">
+                    <div className="relative w-32 h-32 rounded overflow-hidden shrink-0">
                       <Image
                         src={post.featuredImage}
                         alt={post.title}
