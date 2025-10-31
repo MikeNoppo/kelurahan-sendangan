@@ -39,7 +39,7 @@ export function HeroSection() {
           sizes="100vw"
         />
         {/* Gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-b from-slate-900/50 via-transparent to-slate-900/80" />
+        <div className="absolute inset-0 bg-linear-to-b from-slate-900/50 via-transparent to-slate-900/80" />
       </div>
 
       {/* Animated gradient orbs */}
@@ -66,7 +66,7 @@ export function HeroSection() {
         {/* Main heading */}
         <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 text-balance animate-fade-in-up animation-delay-200">
           Selamat Datang di
-          <span className="block mt-2 bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent animate-float">
+          <span className="block mt-2 bg-linear-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent animate-float">
             Kelurahan Sendangan
           </span>
         </h1>
