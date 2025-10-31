@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { revalidatePath } from 'next/cache'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { unlink } from 'fs/promises'
@@ -28,9 +29,7 @@ export async function DELETE(
     }
 
     try {
-      // Only attempt to remove local upload files (those under /uploads/)
       if (item.url && item.url.startsWith('/uploads/')) {
-        // Strip query params (e.g. /uploads/file.jpg?ver=1)
         const localPath = item.url.split('?')[0]
         const filename = localPath.split('/').pop()
         if (filename) {
@@ -38,7 +37,6 @@ export async function DELETE(
           try {
             await unlink(filePath)
           } catch (fileError) {
-            // Ignore missing file (ENOENT), but log other errors
             if ((fileError as any)?.code !== 'ENOENT') {
               console.error('File deletion error:', fileError)
             }
@@ -52,6 +50,9 @@ export async function DELETE(
     await prisma.galleryItem.delete({
       where: { id }
     })
+
+    revalidatePath('/', 'layout')
+    revalidatePath('/galeri')
 
     return NextResponse.json({ success: true })
   } catch (error) {

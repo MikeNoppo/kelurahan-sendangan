@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 
@@ -67,6 +68,9 @@ export async function POST(request: NextRequest) {
         status: status?.toUpperCase() || 'DRAFT'
       }
     });
+
+    revalidatePath('/', 'layout');
+    revalidatePath('/berita');
 
     return NextResponse.json(post);
   } catch (error) {
