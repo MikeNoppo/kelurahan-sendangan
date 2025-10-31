@@ -9,6 +9,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Plus, Upload, Trash2, Loader2, Image as ImageIcon } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { MultipleImageUpload } from "@/components/admin/multiple-image-upload"
+import { Skeleton } from "@/components/ui/skeleton"
 
 interface GalleryItem {
   id: number
@@ -109,8 +110,15 @@ export default function GaleriPage() {
         </CardHeader>
         <CardContent>
           {loading ? (
-            <div className="flex items-center justify-center py-12">
-              <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+                <div key={i} className="overflow-hidden rounded-lg border">
+                  <Skeleton className="aspect-square w-full" />
+                  <div className="p-3">
+                    <Skeleton className="h-4 w-3/4" />
+                  </div>
+                </div>
+              ))}
             </div>
           ) : items.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-center">

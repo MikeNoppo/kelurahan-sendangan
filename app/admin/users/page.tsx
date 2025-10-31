@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog'
 import { Badge } from '@/components/ui/badge'
+import { Skeleton } from '@/components/ui/skeleton'
 import { toast } from 'sonner'
 import { UserPlus, Search, Pencil, Trash2 } from 'lucide-react'
 
@@ -95,8 +96,42 @@ export default function UsersPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-96">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div className="space-y-1">
+            <Skeleton className="h-9 w-48" />
+            <Skeleton className="h-5 w-64" />
+          </div>
+          <Skeleton className="h-10 w-32" />
+        </div>
+
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <Skeleton className="h-7 w-24" />
+              <Skeleton className="h-10 w-64" />
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              <div className="grid grid-cols-3 gap-4 pb-3 border-b">
+                <Skeleton className="h-5 w-20" />
+                <Skeleton className="h-5 w-20" />
+                <Skeleton className="h-5 w-20 ml-auto" />
+              </div>
+              {[1, 2, 3, 4, 5].map((i) => (
+                <div key={i} className="grid grid-cols-3 gap-4 py-4 border-b">
+                  <Skeleton className="h-5 w-48" />
+                  <Skeleton className="h-5 w-24" />
+                  <div className="flex gap-2 justify-end">
+                    <Skeleton className="h-8 w-8" />
+                    <Skeleton className="h-8 w-8" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
       </div>
     )
   }

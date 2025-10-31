@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
 import { Plus, Search, Edit, Trash2, Loader2, Sparkles } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
+import { Skeleton } from "@/components/ui/skeleton"
 
 interface Potential {
   id: number
@@ -23,19 +24,28 @@ export default function PotensiPage() {
   const [items, setItems] = useState<Potential[]>([])
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState("")
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("")
   const [deleteId, setDeleteId] = useState<number | null>(null)
   const [deleting, setDeleting] = useState(false)
   const { toast } = useToast()
 
   useEffect(() => {
-    fetchPotentials()
+    const timer = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery)
+    }, 400)
+
+    return () => clearTimeout(timer)
   }, [searchQuery])
+
+  useEffect(() => {
+    fetchPotentials()
+  }, [debouncedSearchQuery])
 
   const fetchPotentials = async () => {
     setLoading(true)
     try {
       const params = new URLSearchParams()
-      if (searchQuery) params.append('search', searchQuery)
+      if (debouncedSearchQuery) params.append('search', debouncedSearchQuery)
 
       const res = await fetch(`/api/admin/potentials?${params}`)
       const data = await res.json()
@@ -111,8 +121,23 @@ export default function PotensiPage() {
         </CardHeader>
         <CardContent>
           {loading ? (
-            <div className="flex items-center justify-center py-12">
-              <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+                <div key={i} className="rounded-lg border p-6">
+                  <div className="flex flex-col items-center text-center space-y-3">
+                    <Skeleton className="w-16 h-16 rounded-lg" />
+                    <div className="space-y-2 w-full">
+                      <Skeleton className="h-5 w-3/4 mx-auto" />
+                      <Skeleton className="h-4 w-full" />
+                      <Skeleton className="h-4 w-5/6 mx-auto" />
+                    </div>
+                    <div className="flex gap-2 w-full pt-2">
+                      <Skeleton className="h-8 flex-1" />
+                      <Skeleton className="h-8 flex-1" />
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           ) : items.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-center">
