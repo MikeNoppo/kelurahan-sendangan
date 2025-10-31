@@ -162,14 +162,14 @@ export default function CreateStrukturPage() {
             <div className="space-y-2">
               <Label htmlFor="parentId">Atasan / Parent</Label>
               <Select
-                value={formData.parentId}
-                onValueChange={(value) => setFormData({ ...formData, parentId: value })}
+                value={formData.parentId || "none"}
+                onValueChange={(value) => setFormData({ ...formData, parentId: value === "none" ? "" : value })}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="- (Tidak ada / Top Level)" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">- (Tidak ada / Top Level)</SelectItem>
+                  <SelectItem value="none">- (Tidak ada / Top Level)</SelectItem>
                   {members.map((member) => (
                     <SelectItem key={member.id} value={member.id.toString()}>
                       {member.jabatan} - {member.nama}
