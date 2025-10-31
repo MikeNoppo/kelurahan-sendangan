@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
+import { Skeleton } from "@/components/ui/skeleton"
 import { Plus, Search, Edit, Trash2 } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { DeleteConfirmationDialog } from "@/components/admin/delete-confirmation-dialog"
@@ -26,6 +27,7 @@ interface Post {
 
 export default function PostsPage() {
   const [searchQuery, setSearchQuery] = useState("")
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("")
   const [activeTab, setActiveTab] = useState("all")
   const [statusFilter, setStatusFilter] = useState("all")
   const [posts, setPosts] = useState<Post[]>([])
@@ -41,8 +43,16 @@ export default function PostsPage() {
   }
 
   useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery)
+    }, 400)
+
+    return () => clearTimeout(timer)
+  }, [searchQuery])
+
+  useEffect(() => {
     fetchPosts()
-  }, [activeTab, statusFilter, searchQuery])
+  }, [activeTab, statusFilter, debouncedSearchQuery])
 
   const fetchPosts = async () => {
     setLoading(true)
@@ -50,7 +60,7 @@ export default function PostsPage() {
       const params = new URLSearchParams()
       if (activeTab !== 'all') params.append('type', activeTab)
       if (statusFilter !== 'all') params.append('status', statusFilter)
-      if (searchQuery) params.append('search', searchQuery)
+      if (debouncedSearchQuery) params.append('search', debouncedSearchQuery)
 
       const res = await fetch(`/api/admin/posts?${params}`)
       const data = await res.json()
@@ -150,7 +160,27 @@ export default function PostsPage() {
         </CardHeader>
         <CardContent>
           {loading ? (
-            <div className="py-12 text-center text-slate-500">Loading...</div>
+            <div className="space-y-4">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="flex items-center gap-4 rounded-lg border p-4">
+                  <Skeleton className="w-24 h-24 rounded shrink-0" />
+                  <div className="flex-1 space-y-2">
+                    <div className="flex items-center gap-2">
+                      <Skeleton className="h-5 w-48" />
+                      <Skeleton className="h-5 w-16" />
+                      <Skeleton className="h-5 w-20" />
+                    </div>
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-4 w-3/4" />
+                    <Skeleton className="h-3 w-24" />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Skeleton className="h-9 w-9 rounded-md" />
+                    <Skeleton className="h-9 w-9 rounded-md" />
+                  </div>
+                </div>
+              ))}
+            </div>
           ) : posts.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-center">
               <div className="rounded-full bg-slate-100 p-6 mb-4">
