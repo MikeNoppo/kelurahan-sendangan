@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { use, useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -21,11 +21,11 @@ interface StructureMember {
 }
 
 export default function EditStrukturPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params)
   const router = useRouter()
   const { toast } = useToast()
   const [isLoading, setIsLoading] = useState(false)
   const [loading, setLoading] = useState(true)
-  const [memberId, setMemberId] = useState<string>("")
   const [members, setMembers] = useState<StructureMember[]>([])
   const [formData, setFormData] = useState({
     jabatan: "",
@@ -36,21 +36,13 @@ export default function EditStrukturPage({ params }: { params: Promise<{ id: str
   })
 
   useEffect(() => {
-    params.then(p => {
-      setMemberId(p.id)
-    })
-  }, [params])
-
-  useEffect(() => {
-    if (memberId) {
-      fetchMember()
-      fetchMembers()
-    }
-  }, [memberId])
+    fetchMember()
+    fetchMembers()
+  }, [])
 
   const fetchMember = async () => {
     try {
-      const res = await fetch(`/api/admin/structure/${memberId}`)
+      const res = await fetch(`/api/admin/structure/${id}`)
       const data = await res.json()
       
       setFormData({
@@ -75,7 +67,7 @@ export default function EditStrukturPage({ params }: { params: Promise<{ id: str
     try {
       const res = await fetch('/api/admin/structure')
       const data = await res.json()
-      setMembers(data.filter((m: StructureMember) => m.id !== parseInt(memberId)))
+      setMembers(data.filter((m: StructureMember) => m.id !== parseInt(id)))
     } catch (error) {
       console.error('Failed to fetch members:', error)
     }
@@ -96,7 +88,7 @@ export default function EditStrukturPage({ params }: { params: Promise<{ id: str
     setIsLoading(true)
 
     try {
-      const res = await fetch(`/api/admin/structure/${memberId}`, {
+      const res = await fetch(`/api/admin/structure/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

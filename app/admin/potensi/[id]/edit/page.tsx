@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { use, useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -13,11 +13,11 @@ import { useToast } from "@/hooks/use-toast"
 import { ImageUpload } from "@/components/admin/image-upload"
 
 export default function EditPotensiPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params)
   const router = useRouter()
   const { toast } = useToast()
   const [isLoading, setIsLoading] = useState(false)
   const [loading, setLoading] = useState(true)
-  const [potentialId, setPotentialId] = useState<string>("")
   const [formData, setFormData] = useState({
     name: "",
     desc: "",
@@ -26,20 +26,12 @@ export default function EditPotensiPage({ params }: { params: Promise<{ id: stri
   })
 
   useEffect(() => {
-    params.then(p => {
-      setPotentialId(p.id)
-    })
-  }, [params])
-
-  useEffect(() => {
-    if (potentialId) {
-      fetchPotential()
-    }
-  }, [potentialId])
+    fetchPotential()
+  }, [])
 
   const fetchPotential = async () => {
     try {
-      const res = await fetch(`/api/admin/potentials/${potentialId}`)
+      const res = await fetch(`/api/admin/potentials/${id}`)
       const data = await res.json()
       
       setFormData({
@@ -74,7 +66,7 @@ export default function EditPotensiPage({ params }: { params: Promise<{ id: stri
     setIsLoading(true)
 
     try {
-      const res = await fetch(`/api/admin/potentials/${potentialId}`, {
+      const res = await fetch(`/api/admin/potentials/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
