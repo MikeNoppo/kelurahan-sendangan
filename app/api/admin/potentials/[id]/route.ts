@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { revalidatePath } from 'next/cache'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { unlink } from 'fs/promises'
@@ -61,6 +62,9 @@ export async function PATCH(
       }
     })
 
+    revalidatePath('/', 'layout')
+    revalidatePath('/potensi')
+
     return NextResponse.json(item)
   } catch (error) {
     console.error('Potential update error:', error)
@@ -104,6 +108,9 @@ export async function DELETE(
     await prisma.potential.delete({
       where: { id }
     })
+
+    revalidatePath('/', 'layout')
+    revalidatePath('/potensi')
 
     return NextResponse.json({ success: true })
   } catch (error) {

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { revalidatePath } from 'next/cache'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 
@@ -70,6 +71,9 @@ export async function PATCH(
       }
     })
 
+    revalidatePath('/', 'layout')
+    revalidatePath('/struktur')
+
     return NextResponse.json(member)
   } catch (error) {
     console.error('Structure update error:', error)
@@ -103,6 +107,9 @@ export async function DELETE(
     await prisma.structureMember.delete({
       where: { id }
     })
+
+    revalidatePath('/', 'layout')
+    revalidatePath('/struktur')
 
     return NextResponse.json({ 
       success: true,
