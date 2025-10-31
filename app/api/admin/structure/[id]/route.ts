@@ -52,7 +52,9 @@ export async function PATCH(
       return NextResponse.json({ error: 'Jabatan and nama are required' }, { status: 400 })
     }
 
-    if (parentId === id) {
+    const normalizedParentId = parentId && parentId !== '' ? String(parentId) : null
+
+    if (normalizedParentId === id) {
       return NextResponse.json({ error: 'Cannot set self as parent' }, { status: 400 })
     }
 
@@ -63,7 +65,7 @@ export async function PATCH(
         nama: nama.trim(),
         nip: nip?.trim() || null,
         lingkungan: lingkungan ? parseInt(lingkungan) : null,
-        parentId: parentId || null,
+        parentId: normalizedParentId,
         urutan: urutan ?? undefined
       },
       include: {

@@ -41,9 +41,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Jabatan and nama are required' }, { status: 400 })
     }
 
+    const normalizedParentId = parentId && parentId !== '' ? String(parentId) : null
+
     const maxUrutan = await prisma.structureMember.aggregate({
       _max: { urutan: true },
-      where: { parentId: parentId || null }
+      where: { parentId: normalizedParentId }
     })
 
     const member = await prisma.structureMember.create({
@@ -52,7 +54,7 @@ export async function POST(request: NextRequest) {
         nama: nama.trim(),
         nip: nip?.trim() || null,
         lingkungan: lingkungan ? parseInt(lingkungan) : null,
-        parentId: parentId || null,
+        parentId: normalizedParentId,
         urutan: urutan ?? ((maxUrutan._max?.urutan ?? 0) + 1)
       },
       include: {
