@@ -52,6 +52,21 @@ export async function PATCH(
       return NextResponse.json({ error: 'Name is required (min 3 characters)' }, { status: 400 })
     }
 
+    if (imageUrl !== undefined) {
+      const currentItem = await prisma.potential.findUnique({
+        where: { id }
+      })
+
+      if (currentItem?.imageUrl && currentItem.imageUrl !== imageUrl && currentItem.imageUrl.startsWith('/uploads/')) {
+        try {
+          const oldFilepath = join(process.cwd(), 'public', currentItem.imageUrl)
+          await unlink(oldFilepath)
+        } catch (err) {
+          console.error('Failed to delete old image:', err)
+        }
+      }
+    }
+
     const item = await prisma.potential.update({
       where: { id },
       data: {
