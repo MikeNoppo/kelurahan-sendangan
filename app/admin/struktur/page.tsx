@@ -5,7 +5,7 @@ import dynamic from "next/dynamic"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
-import { Plus, Users } from "lucide-react"
+import { Plus, Users, CheckCircle2 } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import StructureModal from "./components/structure-modal"
 import CanvasSkeleton from "./components/canvas-skeleton"
@@ -24,6 +24,8 @@ interface StructureMember {
   positionX: number
   positionY: number
   parentId: string | null
+  isDraft: boolean
+  publishedAt: Date | null
 }
 
 export default function StrukturPage() {
@@ -33,7 +35,10 @@ export default function StrukturPage() {
   const [deleting, setDeleting] = useState(false)
   const [showModal, setShowModal] = useState(false)
   const [editMember, setEditMember] = useState<StructureMember | null>(null)
-  const { toast } = useToast()
+  const [hasUnpublished, setHasUnpublished] = useState(false)
+  const [lastPublishedAt, setLastPublishedAt] = useState<Date | null>(null)
+  const [publishing, setPublishing] = useState(false)
+  const { toast} = useToast()
 
   useEffect(() => {
     fetchStructure()
@@ -44,7 +49,9 @@ export default function StrukturPage() {
     try {
       const res = await fetch('/api/admin/structure')
       const data = await res.json()
-      setMembers(data)
+      setMembers(data.members || data)
+      setHasUnpublished(data.hasUnpublished || false)
+      setLastPublishedAt(data.lastPublishedAt ? new Date(data.lastPublishedAt) : null)
     } catch (error) {
       toast({
         title: "Error",
@@ -106,6 +113,41 @@ export default function StrukturPage() {
     setEditMember(null)
   }
 
+  const handlePublish = async () => {
+    if (!hasUnpublished) {
+      toast({
+        title: "Info",
+        description: "Tidak ada perubahan untuk dipublikasi",
+      })
+      return
+    }
+
+    setPublishing(true)
+    try {
+      const res = await fetch('/api/admin/structure/publish', {
+        method: 'POST',
+      })
+
+      if (res.ok) {
+        toast({
+          title: "Berhasil",
+          description: "Struktur berhasil dipublikasi",
+        })
+        fetchStructure()
+      } else {
+        throw new Error('Publish failed')
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Gagal mempublikasi struktur",
+        variant: "destructive",
+      })
+    } finally {
+      setPublishing(false)
+    }
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -113,10 +155,28 @@ export default function StrukturPage() {
           <h2 className="text-3xl font-bold text-slate-900">Struktur Management</h2>
           <p className="text-slate-600 mt-1">Kelola struktur organisasi pemerintahan</p>
         </div>
-        <Button onClick={handleAddNew}>
-          <Plus className="mr-2 h-4 w-4" />
-          Tambah Anggota
-        </Button>
+        <div className="flex items-center gap-3">
+          {hasUnpublished && (
+            <Button onClick={handlePublish} disabled={publishing} className="bg-green-600 hover:bg-green-700">
+              <CheckCircle2 className="mr-2 h-4 w-4" />
+              {publishing ? "Publishing..." : "Publish Changes"}
+            </Button>
+          )}
+          {lastPublishedAt && (
+            <span className="text-sm text-muted-foreground">
+              Last published: {lastPublishedAt.toLocaleString('id-ID')}
+            </span>
+          )}
+          {hasUnpublished && (
+            <span className="text-sm text-orange-600 font-medium">
+              • Unpublished changes
+            </span>
+          )}
+          <Button onClick={handleAddNew}>
+            <Plus className="mr-2 h-4 w-4" />
+            Tambah Anggota
+          </Button>
+        </div>
       </div>
 
       <Card>
@@ -131,7 +191,9 @@ export default function StrukturPage() {
               <div className="rounded-full bg-slate-100 p-6 mb-4">
                 <Users className="h-12 w-12 text-slate-400" />
               </div>
-              <h3 className="text-lg font-semibold text-slate-900 mb-2">Belum ada anggota</h3>
+              <h3 className="text-lg font-semibold text-slate-900 mb-2">
+                Belum ada anggota
+              </h3>
               <p className="text-slate-600 mb-4">Tambahkan anggota struktur organisasi</p>
               <Button onClick={handleAddNew}>
                 <Plus className="mr-2 h-4 w-4" />

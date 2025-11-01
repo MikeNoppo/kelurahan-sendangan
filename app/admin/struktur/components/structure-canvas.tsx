@@ -50,6 +50,8 @@ type StructureMember = {
   positionX: number
   positionY: number
   parentId: string | null
+  isDraft: boolean
+  publishedAt: Date | null
 }
 
 type StructureCanvasProps = {
@@ -180,6 +182,7 @@ export default function StructureCanvas({
         nip: member.nip,
         fotoUrl: member.fotoUrl,
         level: calculateLevel(member.id, membersList),
+        isDraft: member.isDraft,
       },
     }))
 

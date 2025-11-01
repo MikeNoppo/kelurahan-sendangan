@@ -15,6 +15,7 @@ type StructureMember = {
   nama: string
   nip: string | null
   fotoUrl: string | null
+  isDraft?: boolean
 }
 
 type StructureModalProps = {
@@ -56,7 +57,7 @@ export default function StructureModal({
     }
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent, isDraft: boolean = false) => {
     e.preventDefault()
     
     if (!formData.jabatan.trim() || !formData.nama.trim()) {
@@ -215,12 +216,17 @@ export default function StructureModal({
             />
           </div>
 
-          <div className="flex items-center gap-4 pt-4">
-            <Button type="submit" disabled={isLoading} className="gap-2">
+          <div className="flex items-center gap-3 pt-4">
+            <Button 
+              type="button" 
+              disabled={isLoading} 
+              className="gap-2"
+              onClick={(e) => handleSubmit(e, false)}
+            >
               <Save className="h-4 w-4" />
               {isLoading ? 'Menyimpan...' : 'Simpan'}
             </Button>
-            <Button type="button" variant="outline" onClick={onClose}>
+            <Button type="button" variant="ghost" onClick={onClose}>
               Batal
             </Button>
           </div>
