@@ -16,12 +16,15 @@ import {
   OnNodesChange,
   OnEdgesChange,
   OnConnect,
+  Panel,
 } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
 import StructureNode from './structure-node'
 import FloatingToolbar from './floating-toolbar'
 import { getLayoutedElements } from '@/lib/structure-layout'
 import { useToast } from '@/hooks/use-toast'
+import { ZoomIn, ZoomOut, Maximize2 } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 
 type StructureMember = {
   id: string
@@ -56,7 +59,19 @@ export default function StructureCanvas({
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([])
   const [selectedNode, setSelectedNode] = useState<string | null>(null)
   const [toolbarPosition, setToolbarPosition] = useState({ x: 0, y: 0 })
+  const [isMobile, setIsMobile] = useState(false)
   const reactFlowWrapper = useRef<HTMLDivElement>(null)
+  const reactFlowInstance = useRef<any>(null)
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 1024)
+    }
+    
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
 
   const calculateLevel = useCallback((memberId: string, allMembers: StructureMember[]): number => {
     const member = allMembers.find(m => m.id === memberId)
@@ -209,6 +224,18 @@ export default function StructureCanvas({
     }
   }, [setEdges, toast, onRefresh])
 
+  const handleZoomIn = () => {
+    reactFlowInstance.current?.zoomIn()
+  }
+
+  const handleZoomOut = () => {
+    reactFlowInstance.current?.zoomOut()
+  }
+
+  const handleFitView = () => {
+    reactFlowInstance.current?.fitView({ padding: 0.2 })
+  }
+
   return (
     <div ref={reactFlowWrapper} className="w-full h-full relative">
       <ReactFlow
@@ -220,15 +247,53 @@ export default function StructureCanvas({
         onNodeClick={handleNodeClick}
         onPaneClick={handlePaneClick}
         nodeTypes={nodeTypes}
+        onInit={(instance) => {
+          reactFlowInstance.current = instance
+        }}
         fitView
         minZoom={0.1}
         maxZoom={2}
+        panOnDrag={isMobile ? [1, 2] : true}
+        panOnScroll={!isMobile}
+        zoomOnScroll={!isMobile}
+        zoomOnPinch={isMobile}
+        zoomOnDoubleClick={!isMobile}
       >
         <Background variant={BackgroundVariant.Dots} gap={16} size={1} />
-        <Controls />
+        
+        {!isMobile && <Controls />}
+        
+        {isMobile && (
+          <Panel position="bottom-right" className="flex flex-col gap-2 mb-4 mr-4">
+            <Button
+              size="icon"
+              variant="secondary"
+              onClick={handleZoomIn}
+              className="bg-white shadow-lg hover:bg-slate-50"
+            >
+              <ZoomIn className="h-5 w-5" />
+            </Button>
+            <Button
+              size="icon"
+              variant="secondary"
+              onClick={handleZoomOut}
+              className="bg-white shadow-lg hover:bg-slate-50"
+            >
+              <ZoomOut className="h-5 w-5" />
+            </Button>
+            <Button
+              size="icon"
+              variant="secondary"
+              onClick={handleFitView}
+              className="bg-white shadow-lg hover:bg-slate-50"
+            >
+              <Maximize2 className="h-5 w-5" />
+            </Button>
+          </Panel>
+        )}
       </ReactFlow>
       
-      {selectedNode && (
+      {selectedNode && !isMobile && (
         <FloatingToolbar
           nodeId={selectedNode}
           position={toolbarPosition}
@@ -241,6 +306,33 @@ export default function StructureCanvas({
             setSelectedNode(null)
           }}
         />
+      )}
+      
+      {selectedNode && isMobile && (
+        <div className="absolute bottom-20 left-0 right-0 mx-4">
+          <div className="bg-white rounded-lg shadow-xl border border-slate-200 p-4 flex gap-2">
+            <Button
+              className="flex-1"
+              variant="outline"
+              onClick={() => {
+                onEdit(selectedNode)
+                setSelectedNode(null)
+              }}
+            >
+              Edit
+            </Button>
+            <Button
+              className="flex-1"
+              variant="outline"
+              onClick={() => {
+                onDelete(selectedNode)
+                setSelectedNode(null)
+              }}
+            >
+              Delete
+            </Button>
+          </div>
+        </div>
       )}
     </div>
   )
