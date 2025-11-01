@@ -609,17 +609,24 @@ export default function StructureCanvas({
               maxZoom={2}
               panOnDrag={isMobile ? [1, 2] : true}
               panOnScroll={!isMobile}
-              zoomOnScroll={!isMobile}
-              zoomOnPinch={isMobile}
+              zoomOnScroll={true}
+              zoomOnPinch={true}
               zoomOnDoubleClick={!isMobile}
               multiSelectionKeyCode="Shift"
             >
               <Background variant={BackgroundVariant.Dots} gap={16} size={1} />
               
-              {!isMobile && <Controls />}
+              {/* Zoom controls - always visible */}
+              <Controls 
+                showZoom={true}
+                showFitView={true}
+                showInteractive={false}
+                position="bottom-right"
+              />
               
+              {/* Mobile-only custom controls */}
               {isMobile && (
-                <Panel position="bottom-right" className="flex flex-col gap-2 mb-4 mr-4">
+                <Panel position="bottom-right" className="flex flex-col gap-2 mb-20 mr-4">
                   <Button
                     size="icon"
                     variant="secondary"

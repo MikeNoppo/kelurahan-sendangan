@@ -389,3 +389,45 @@
 .glow-on-hover:hover {
   box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
 }
+
+/* React Flow Controls Styling */
+.react-flow__controls {
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.react-flow__controls-button {
+  background: white;
+  border: none;
+  border-bottom: 1px solid #e2e8f0;
+  padding: 0.5rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  transition: all 0.2s;
+}
+
+.react-flow__controls-button:hover {
+  background: #f8fafc;
+  transform: scale(1.05);
+}
+
+.react-flow__controls-button:active {
+  transform: scale(0.95);
+}
+
+.react-flow__controls-button:last-child {
+  border-bottom: none;
+}
+
+.react-flow__controls-button svg {
+  width: 1.25rem;
+  height: 1.25rem;
+  fill: #334155;
+}
+
+/* React Flow Panel Styling */
+.react-flow__panel {
+  z-index: 5;
+}
