@@ -73,7 +73,8 @@ async function getPotentials(): Promise<Potential[]> {
       { next: { revalidate: 3600 } }
     )
     if (!res.ok) return []
-    return res.json()
+    const data = await res.json()
+    return data.items || []
   } catch (error) {
     console.error('Failed to fetch potentials:', error)
     return []
@@ -87,7 +88,8 @@ async function getGallery(): Promise<GalleryItem[]> {
       { next: { revalidate: 3600 } }
     )
     if (!res.ok) return []
-    return res.json()
+    const data = await res.json()
+    return data.items || []
   } catch (error) {
     console.error('Failed to fetch gallery:', error)
     return []
