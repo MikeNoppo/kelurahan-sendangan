@@ -9,7 +9,9 @@ export async function GET() {
         jabatan: true,
         nama: true,
         nip: true,
-        lingkungan: true,
+        fotoUrl: true,
+        positionX: true,
+        positionY: true,
         parentId: true,
         urutan: true
       },
