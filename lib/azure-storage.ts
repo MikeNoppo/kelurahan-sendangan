@@ -4,16 +4,24 @@ const accountName = process.env.AZURE_STORAGE_ACCOUNT_NAME
 const accountKey = process.env.AZURE_STORAGE_ACCOUNT_KEY
 const containerName = process.env.AZURE_STORAGE_CONTAINER_NAME || 'uploads'
 
-if (!accountName || !accountKey) {
-  throw new Error('Azure Storage credentials are not configured')
+let blobServiceClient: BlobServiceClient | null = null
+
+function getBlobServiceClient(): BlobServiceClient {
+  if (!accountName || !accountKey) {
+    throw new Error('Azure Storage credentials are not configured')
+  }
+
+  if (!blobServiceClient) {
+    blobServiceClient = BlobServiceClient.fromConnectionString(
+      `DefaultEndpointsProtocol=https;AccountName=${accountName};AccountKey=${accountKey};EndpointSuffix=core.windows.net`
+    )
+  }
+
+  return blobServiceClient
 }
 
-const blobServiceClient = BlobServiceClient.fromConnectionString(
-  `DefaultEndpointsProtocol=https;AccountName=${accountName};AccountKey=${accountKey};EndpointSuffix=core.windows.net`
-)
-
 export function getContainerClient(): ContainerClient {
-  return blobServiceClient.getContainerClient(containerName)
+  return getBlobServiceClient().getContainerClient(containerName)
 }
 
 export async function uploadBlob(
