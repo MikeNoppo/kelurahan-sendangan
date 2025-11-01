@@ -76,6 +76,28 @@ model StructureMember {
   @@index([parentId])
 }
 
+model PublishedStructure {
+  id         String    @id @default(uuid())
+  jabatan    String
+  nama       String
+  nip        String?
+  fotoUrl    String?
+  positionX  Float     @default(0)
+  positionY  Float     @default(0)
+  parentId   String?
+  urutan     Int?
+  publishedAt DateTime @default(now())
+  
+  @@index([parentId])
+}
+
+model StructureMetadata {
+  id              Int      @id @default(1)
+  hasUnpublished  Boolean  @default(false)
+  lastPublishedAt DateTime?
+  updatedAt       DateTime @updatedAt
+}
+
 model Setting {
   key       String   @id
   value     String   @db.Text
