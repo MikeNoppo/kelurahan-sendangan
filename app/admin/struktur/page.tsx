@@ -5,12 +5,14 @@ import dynamic from "next/dynamic"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
-import { Plus, Loader2, Users } from "lucide-react"
+import { Plus, Users } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import StructureModal from "./components/structure-modal"
+import CanvasSkeleton from "./components/canvas-skeleton"
 
 const StructureCanvas = dynamic(() => import('./components/structure-canvas'), {
   ssr: false,
+  loading: () => <CanvasSkeleton />,
 })
 
 interface StructureMember {
@@ -123,9 +125,7 @@ export default function StrukturPage() {
         </CardHeader>
         <CardContent className="p-0" style={{ height: 'calc(100vh - 300px)' }}>
           {loading ? (
-            <div className="flex items-center justify-center h-full">
-              <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
-            </div>
+            <CanvasSkeleton />
           ) : members.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-center">
               <div className="rounded-full bg-slate-100 p-6 mb-4">
@@ -178,14 +178,7 @@ export default function StrukturPage() {
               disabled={deleting}
               className="bg-red-600 hover:bg-red-700"
             >
-              {deleting ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Menghapus...
-                </>
-              ) : (
-                'Hapus'
-              )}
+              {deleting ? 'Menghapus...' : 'Hapus'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

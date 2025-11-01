@@ -3,11 +3,12 @@
 import { useState, useEffect } from "react"
 import dynamic from "next/dynamic"
 import Image from "next/image"
-import { Skeleton } from "@/components/ui/skeleton"
 import { Users } from "lucide-react"
+import CanvasSkeleton from "@/app/admin/struktur/components/canvas-skeleton"
 
 const PublicStructureCanvas = dynamic(() => import('./components/public-structure-canvas'), {
   ssr: false,
+  loading: () => <CanvasSkeleton />,
 })
 
 interface StructureMember {
@@ -66,12 +67,7 @@ export default function StrukturPage() {
       <section className="py-8 px-4 bg-white">
         <div className="mx-auto max-w-7xl" style={{ height: 'calc(100vh - 200px)' }}>
           {loading ? (
-            <div className="flex items-center justify-center h-full">
-              <div className="space-y-4 text-center">
-                <Skeleton className="h-20 w-64 mx-auto" />
-                <Skeleton className="h-40 w-full" />
-              </div>
-            </div>
+            <CanvasSkeleton />
           ) : members.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-center">
               <Users className="h-16 w-16 text-muted-foreground mb-4" />

@@ -1,19 +1,21 @@
 "use client"
 
-import { useCallback, useEffect } from 'react'
+import { useCallback, useEffect, useState, useRef } from 'react'
 import {
   ReactFlow,
   Node,
   Edge,
-  Controls,
   Background,
   useNodesState,
   useEdgesState,
   BackgroundVariant,
+  Panel,
 } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
 import StructureNode from '@/app/admin/struktur/components/structure-node'
 import { getLayoutedElements } from '@/lib/structure-layout'
+import { ZoomIn, ZoomOut, Maximize2 } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 
 type StructureMember = {
   id: string
@@ -37,6 +39,18 @@ const nodeTypes = {
 export default function PublicStructureCanvas({ members }: PublicStructureCanvasProps) {
   const [nodes, setNodes] = useNodesState<Node>([])
   const [edges, setEdges] = useEdgesState<Edge>([])
+  const [isMobile, setIsMobile] = useState(false)
+  const reactFlowInstance = useRef<any>(null)
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+    
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
 
   const calculateLevel = useCallback((memberId: string, allMembers: StructureMember[]): number => {
     const member = allMembers.find(m => m.id === memberId)
@@ -92,6 +106,18 @@ export default function PublicStructureCanvas({ members }: PublicStructureCanvas
     }
   }, [members, buildNodesAndEdges, setNodes, setEdges])
 
+  const handleZoomIn = () => {
+    reactFlowInstance.current?.zoomIn()
+  }
+
+  const handleZoomOut = () => {
+    reactFlowInstance.current?.zoomOut()
+  }
+
+  const handleFitView = () => {
+    reactFlowInstance.current?.fitView({ padding: 0.15 })
+  }
+
   return (
     <div className="w-full h-full">
       <ReactFlow
@@ -101,11 +127,14 @@ export default function PublicStructureCanvas({ members }: PublicStructureCanvas
         nodesDraggable={false}
         nodesConnectable={false}
         elementsSelectable={false}
-        panOnDrag={false}
+        onInit={(instance) => {
+          reactFlowInstance.current = instance
+        }}
+        panOnDrag={isMobile ? [1, 2] : false}
         zoomOnScroll={false}
-        zoomOnPinch={false}
+        zoomOnPinch={isMobile}
         zoomOnDoubleClick={false}
-        preventScrolling={true}
+        preventScrolling={!isMobile}
         fitView
         fitViewOptions={{
           padding: 0.15,
@@ -117,6 +146,35 @@ export default function PublicStructureCanvas({ members }: PublicStructureCanvas
         maxZoom={1}
       >
         <Background variant={BackgroundVariant.Dots} gap={16} size={1} />
+        
+        {isMobile && (
+          <Panel position="bottom-right" className="flex flex-col gap-2 mb-4 mr-4">
+            <Button
+              size="icon"
+              variant="secondary"
+              onClick={handleZoomIn}
+              className="bg-white shadow-lg hover:bg-slate-50"
+            >
+              <ZoomIn className="h-5 w-5" />
+            </Button>
+            <Button
+              size="icon"
+              variant="secondary"
+              onClick={handleZoomOut}
+              className="bg-white shadow-lg hover:bg-slate-50"
+            >
+              <ZoomOut className="h-5 w-5" />
+            </Button>
+            <Button
+              size="icon"
+              variant="secondary"
+              onClick={handleFitView}
+              className="bg-white shadow-lg hover:bg-slate-50"
+            >
+              <Maximize2 className="h-5 w-5" />
+            </Button>
+          </Panel>
+        )}
       </ReactFlow>
     </div>
   )
