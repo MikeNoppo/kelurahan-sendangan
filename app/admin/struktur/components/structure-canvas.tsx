@@ -17,14 +17,21 @@ import {
   OnEdgesChange,
   OnConnect,
   Panel,
+  useReactFlow,
 } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
 import StructureNode from './structure-node'
 import FloatingToolbar from './floating-toolbar'
 import { getLayoutedElements } from '@/lib/structure-layout'
 import { useToast } from '@/hooks/use-toast'
-import { ZoomIn, ZoomOut, Maximize2 } from 'lucide-react'
+import { ZoomIn, ZoomOut, Maximize2, Copy, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
+} from '@/components/ui/context-menu'
 
 type StructureMember = {
   id: string
@@ -44,6 +51,11 @@ type StructureCanvasProps = {
   onDelete: (id: string) => void
 }
 
+type HistoryState = {
+  nodes: Node[]
+  edges: Edge[]
+}
+
 const nodeTypes = {
   structureNode: StructureNode,
 }
@@ -58,8 +70,17 @@ export default function StructureCanvas({
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([])
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([])
   const [selectedNode, setSelectedNode] = useState<string | null>(null)
+  const [selectedNodes, setSelectedNodes] = useState<string[]>([])
   const [toolbarPosition, setToolbarPosition] = useState({ x: 0, y: 0 })
   const [isMobile, setIsMobile] = useState(false)
+  const [contextMenuNode, setContextMenuNode] = useState<string | null>(null)
+  const [clipboard, setClipboard] = useState<Node | null>(null)
+  
+  // Undo/Redo state
+  const [history, setHistory] = useState<HistoryState[]>([])
+  const [historyIndex, setHistoryIndex] = useState(-1)
+  const [isUndoRedo, setIsUndoRedo] = useState(false)
+  
   const reactFlowWrapper = useRef<HTMLDivElement>(null)
   const reactFlowInstance = useRef<any>(null)
 
@@ -72,6 +93,65 @@ export default function StructureCanvas({
     window.addEventListener('resize', checkMobile)
     return () => window.removeEventListener('resize', checkMobile)
   }, [])
+
+  // Save to history (for undo/redo)
+  const saveToHistory = useCallback((newNodes: Node[], newEdges: Edge[]) => {
+    if (isUndoRedo) return
+    
+    setHistory(prev => {
+      const newHistory = prev.slice(0, historyIndex + 1)
+      newHistory.push({ nodes: newNodes, edges: newEdges })
+      // Keep max 50 history items
+      if (newHistory.length > 50) {
+        newHistory.shift()
+        return newHistory
+      }
+      return newHistory
+    })
+    setHistoryIndex(prev => Math.min(prev + 1, 49))
+  }, [historyIndex, isUndoRedo])
+
+  // Undo function
+  const handleUndo = useCallback(() => {
+    if (historyIndex > 0) {
+      setIsUndoRedo(true)
+      const prevState = history[historyIndex - 1]
+      setNodes(prevState.nodes)
+      setEdges(prevState.edges)
+      setHistoryIndex(prev => prev - 1)
+      
+      // Save positions to DB
+      saveAllPositions(prevState.nodes)
+      
+      setTimeout(() => setIsUndoRedo(false), 100)
+      
+      toast({
+        title: 'Undo',
+        description: 'Perubahan dibatalkan',
+      })
+    }
+  }, [history, historyIndex, setNodes, setEdges, toast])
+
+  // Redo function
+  const handleRedo = useCallback(() => {
+    if (historyIndex < history.length - 1) {
+      setIsUndoRedo(true)
+      const nextState = history[historyIndex + 1]
+      setNodes(nextState.nodes)
+      setEdges(nextState.edges)
+      setHistoryIndex(prev => prev + 1)
+      
+      // Save positions to DB
+      saveAllPositions(nextState.nodes)
+      
+      setTimeout(() => setIsUndoRedo(false), 100)
+      
+      toast({
+        title: 'Redo',
+        description: 'Perubahan dikembalikan',
+      })
+    }
+  }, [history, historyIndex, setNodes, setEdges, toast])
 
   const calculateLevel = useCallback((memberId: string, allMembers: StructureMember[]): number => {
     const member = allMembers.find(m => m.id === memberId)
@@ -119,11 +199,13 @@ export default function StructureCanvas({
       setEdges(newEdges)
       
       saveAllPositions(layoutedNodes)
+      saveToHistory(layoutedNodes, newEdges)
     } else {
       setNodes(newNodes)
       setEdges(newEdges)
+      saveToHistory(newNodes, newEdges)
     }
-  }, [members, buildNodesAndEdges, setNodes, setEdges])
+  }, [members, buildNodesAndEdges, setNodes, setEdges, saveToHistory])
 
   const saveAllPositions = async (nodesToSave: Node[]) => {
     try {
@@ -145,19 +227,33 @@ export default function StructureCanvas({
   }
 
   const handleNodeClick: NodeMouseHandler = useCallback((event, node) => {
-    setSelectedNode(node.id)
-    
-    const rect = reactFlowWrapper.current?.getBoundingClientRect()
-    if (rect) {
-      setToolbarPosition({
-        x: event.clientX - rect.left,
-        y: event.clientY - rect.top,
+    // Multi-select dengan Shift+Click
+    if (event.shiftKey) {
+      setSelectedNodes(prev => {
+        if (prev.includes(node.id)) {
+          return prev.filter(id => id !== node.id)
+        }
+        return [...prev, node.id]
       })
+    } else {
+      setSelectedNode(node.id)
+      setSelectedNodes([node.id])
+      setContextMenuNode(node.id)
+      
+      const rect = reactFlowWrapper.current?.getBoundingClientRect()
+      if (rect) {
+        setToolbarPosition({
+          x: event.clientX - rect.left,
+          y: event.clientY - rect.top,
+        })
+      }
     }
   }, [])
 
   const handlePaneClick = useCallback(() => {
     setSelectedNode(null)
+    setSelectedNodes([])
+    setContextMenuNode(null)
   }, [])
 
   const handleNodesChangeWithSave: OnNodesChange = useCallback((changes) => {
@@ -165,6 +261,12 @@ export default function StructureCanvas({
     
     const positionChanges = changes.filter(c => c.type === 'position' && c.dragging === false)
     if (positionChanges.length > 0) {
+      // Save to history
+      setNodes(currentNodes => {
+        saveToHistory(currentNodes, edges)
+        return currentNodes
+      })
+      
       positionChanges.forEach(async (change) => {
         if (change.type === 'position' && change.position) {
           try {
@@ -182,7 +284,7 @@ export default function StructureCanvas({
         }
       })
     }
-  }, [onNodesChange])
+  }, [onNodesChange, edges, saveToHistory, setNodes])
 
   const handleConnect: OnConnect = useCallback(async (connection: Connection) => {
     if (!connection.source || !connection.target) return
