@@ -641,7 +641,7 @@ export default function StructureCanvas({
               
               {/* Keyboard Shortcuts Button */}
               {!isMobile && (
-                <Panel position="top-left">
+                <Panel position="top-right" className="mt-2 mr-2">
                   <Sheet open={showShortcuts} onOpenChange={setShowShortcuts}>
                     <SheetTrigger asChild>
                       <Button
@@ -653,26 +653,26 @@ export default function StructureCanvas({
                         Shortcuts
                       </Button>
                     </SheetTrigger>
-                    <SheetContent side="left" className="w-80">
-                      <SheetHeader>
+                    <SheetContent side="right" className="w-72 sm:w-80 px-6">
+                      <SheetHeader className="px-0">
                         <SheetTitle>Keyboard Shortcuts</SheetTitle>
                         <SheetDescription>
                           Gunakan shortcuts untuk navigasi lebih cepat
                         </SheetDescription>
                       </SheetHeader>
                       
-                      <div className="mt-6 space-y-6">
+                      <div className="mt-6 space-y-6 px-0">
                         {/* Undo/Redo */}
                         <div>
                           <h3 className="font-semibold text-sm mb-3 text-slate-700">Undo/Redo</h3>
                           <div className="space-y-2">
-                            <div className="flex items-center justify-between">
+                            <div className="flex items-center justify-between gap-3">
                               <span className="text-sm text-slate-600">Undo</span>
-                              <kbd className="px-2 py-1 bg-slate-100 border border-slate-300 rounded text-xs font-mono">Ctrl+Z</kbd>
+                              <kbd className="px-2 py-1 bg-slate-100 border border-slate-300 rounded text-xs font-mono whitespace-nowrap">Ctrl+Z</kbd>
                             </div>
-                            <div className="flex items-center justify-between">
+                            <div className="flex items-center justify-between gap-3">
                               <span className="text-sm text-slate-600">Redo</span>
-                              <kbd className="px-2 py-1 bg-slate-100 border border-slate-300 rounded text-xs font-mono">Ctrl+Y</kbd>
+                              <kbd className="px-2 py-1 bg-slate-100 border border-slate-300 rounded text-xs font-mono whitespace-nowrap">Ctrl+Y</kbd>
                             </div>
                           </div>
                         </div>
@@ -681,13 +681,13 @@ export default function StructureCanvas({
                         <div>
                           <h3 className="font-semibold text-sm mb-3 text-slate-700">Copy/Paste</h3>
                           <div className="space-y-2">
-                            <div className="flex items-center justify-between">
+                            <div className="flex items-center justify-between gap-3">
                               <span className="text-sm text-slate-600">Copy</span>
-                              <kbd className="px-2 py-1 bg-slate-100 border border-slate-300 rounded text-xs font-mono">Ctrl+C</kbd>
+                              <kbd className="px-2 py-1 bg-slate-100 border border-slate-300 rounded text-xs font-mono whitespace-nowrap">Ctrl+C</kbd>
                             </div>
-                            <div className="flex items-center justify-between">
+                            <div className="flex items-center justify-between gap-3">
                               <span className="text-sm text-slate-600">Paste</span>
-                              <kbd className="px-2 py-1 bg-slate-100 border border-slate-300 rounded text-xs font-mono">Ctrl+V</kbd>
+                              <kbd className="px-2 py-1 bg-slate-100 border border-slate-300 rounded text-xs font-mono whitespace-nowrap">Ctrl+V</kbd>
                             </div>
                           </div>
                         </div>
@@ -696,17 +696,17 @@ export default function StructureCanvas({
                         <div>
                           <h3 className="font-semibold text-sm mb-3 text-slate-700">Selection</h3>
                           <div className="space-y-2">
-                            <div className="flex items-center justify-between">
+                            <div className="flex items-center justify-between gap-3">
                               <span className="text-sm text-slate-600">Multi-select</span>
-                              <kbd className="px-2 py-1 bg-slate-100 border border-slate-300 rounded text-xs font-mono">Shift+Click</kbd>
+                              <kbd className="px-2 py-1 bg-slate-100 border border-slate-300 rounded text-xs font-mono whitespace-nowrap">Shift+Click</kbd>
                             </div>
-                            <div className="flex items-center justify-between">
+                            <div className="flex items-center justify-between gap-3">
                               <span className="text-sm text-slate-600">Select All</span>
-                              <kbd className="px-2 py-1 bg-slate-100 border border-slate-300 rounded text-xs font-mono">Ctrl+A</kbd>
+                              <kbd className="px-2 py-1 bg-slate-100 border border-slate-300 rounded text-xs font-mono whitespace-nowrap">Ctrl+A</kbd>
                             </div>
-                            <div className="flex items-center justify-between">
+                            <div className="flex items-center justify-between gap-3">
                               <span className="text-sm text-slate-600">Deselect</span>
-                              <kbd className="px-2 py-1 bg-slate-100 border border-slate-300 rounded text-xs font-mono">Esc</kbd>
+                              <kbd className="px-2 py-1 bg-slate-100 border border-slate-300 rounded text-xs font-mono whitespace-nowrap">Esc</kbd>
                             </div>
                           </div>
                         </div>
@@ -715,13 +715,13 @@ export default function StructureCanvas({
                         <div>
                           <h3 className="font-semibold text-sm mb-3 text-slate-700">Actions</h3>
                           <div className="space-y-2">
-                            <div className="flex items-center justify-between">
+                            <div className="flex items-center justify-between gap-3">
                               <span className="text-sm text-slate-600">Delete</span>
-                              <kbd className="px-2 py-1 bg-slate-100 border border-slate-300 rounded text-xs font-mono">Del</kbd>
+                              <kbd className="px-2 py-1 bg-slate-100 border border-slate-300 rounded text-xs font-mono whitespace-nowrap">Del</kbd>
                             </div>
-                            <div className="flex items-center justify-between">
+                            <div className="flex items-center justify-between gap-3">
                               <span className="text-sm text-slate-600">Duplicate</span>
-                              <kbd className="px-2 py-1 bg-slate-100 border border-slate-300 rounded text-xs font-mono">Right-click</kbd>
+                              <kbd className="px-2 py-1 bg-slate-100 border border-slate-300 rounded text-xs font-mono whitespace-nowrap">Right-click</kbd>
                             </div>
                           </div>
                         </div>
@@ -730,13 +730,13 @@ export default function StructureCanvas({
                         <div>
                           <h3 className="font-semibold text-sm mb-3 text-slate-700">Movement</h3>
                           <div className="space-y-2">
-                            <div className="flex items-center justify-between">
+                            <div className="flex items-center justify-between gap-3">
                               <span className="text-sm text-slate-600">Move (5px)</span>
-                              <kbd className="px-2 py-1 bg-slate-100 border border-slate-300 rounded text-xs font-mono">↑ ↓ ← →</kbd>
+                              <kbd className="px-2 py-1 bg-slate-100 border border-slate-300 rounded text-xs font-mono whitespace-nowrap">↑ ↓ ← →</kbd>
                             </div>
-                            <div className="flex items-center justify-between">
+                            <div className="flex items-center justify-between gap-3">
                               <span className="text-sm text-slate-600">Move (20px)</span>
-                              <kbd className="px-2 py-1 bg-slate-100 border border-slate-300 rounded text-xs font-mono">Shift+Arrow</kbd>
+                              <kbd className="px-2 py-1 bg-slate-100 border border-slate-300 rounded text-xs font-mono whitespace-nowrap">Shift+Arrow</kbd>
                             </div>
                           </div>
                         </div>
