@@ -10,7 +10,6 @@ const geistMono = Geist_Mono({ subsets: ["latin"] })
 export const metadata: Metadata = {
   title: "Kelurahan Sendangan",
   description: "Website resmi Kelurahan Sendangan - Akses informasi publik, berita, dan potensi kelurahan",
-  generator: "v0.app",
 }
 
 export default function RootLayout({
