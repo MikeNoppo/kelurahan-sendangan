@@ -41,7 +41,7 @@ interface Settings {
 async function getSettings(): Promise<Settings> {
   try {
     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/api/public/settings`, {
-      next: { revalidate: 3600 }
+      next: { revalidate: 0 }
     })
     if (!res.ok) return {}
     return res.json()

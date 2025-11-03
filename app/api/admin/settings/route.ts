@@ -56,6 +56,7 @@ export async function POST(request: NextRequest) {
     }, {} as Record<string, string>)
 
     revalidatePath('/', 'layout')
+    revalidatePath('/', 'page')
 
     return NextResponse.json(settingsMap)
   } catch (error) {
